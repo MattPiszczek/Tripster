@@ -1,0 +1,49 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="tum.automotive.praktikum.master.ws2013.tripster.NavigateWithMapsAPIDevActivity$PlaceholderFragment" >
+
+    <TextView
+        android:id="@+id/labelLatitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/hello_farNaviDev" />
+
+    <Button
+        android:id="@+id/buttonCLasTarget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/labelLatitude"
+        android:layout_centerHorizontal="true"
+        android:onClick="onClickLocationAsTarget"
+        android:text="Current Location as Target" />
+
+    <Button
+        android:id="@+id/buttonHasTarget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/buttonCLasTarget"
+        android:layout_alignRight="@+id/buttonCLasTarget"
+        android:layout_below="@+id/buttonCLasTarget"
+        android:onClick="onClickHpbfAsTarget"
+        android:text="Hpbf as Target" />
+
+    <Button
+        android:id="@+id/buttonPasTarget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/buttonHasTarget"
+        android:layout_alignRight="@+id/buttonHasTarget"
+        android:layout_below="@+id/buttonHasTarget"
+        android:onClick="onClickTargetFromMap"
+        android:text="Pick Target from Map" />
+
+</RelativeLayout>

@@ -55,13 +55,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="tum.automotive.praktikum.master.ws2013.tripster.navi.far.NaviDevActivity"
-            android:label="@string/title_activity_navi_dev"
+            android:name="tum.automotive.praktikum.master.ws2013.tripster.navi.menu.NavigateWithMapsAPIDevActivity"
+            android:label="@string/title_activity_navigate_with_maps_apidev"
             android:parentActivityName="tum.automotive.praktikum.master.ws2013.tripster.MainSelectorActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="tum.automotive.praktikum.master.ws2013.tripster.MainSelectorActivity" />
         </activity>
+        <!-- 
+        <activity
+            android:name="tum.automotive.praktikum.master.ws2013.tripster.navi.far.NavigateActivity"
+            android:label="@string/title_activity_navigate"
+            android:parentActivityName="tum.automotive.praktikum.master.ws2013.tripster.navi.menu.NavigateWithMapsAPIDevActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="tum.automotive.praktikum.master.ws2013.tripster.navi.menu.NavigateWithMapsAPIDevActivity" />
+        </activity> -->
     </application>
 
 </manifest>
