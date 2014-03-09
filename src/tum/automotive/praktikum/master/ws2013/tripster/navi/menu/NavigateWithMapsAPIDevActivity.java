@@ -2,6 +2,7 @@ package tum.automotive.praktikum.master.ws2013.tripster.navi.menu;
 
 
 import tum.automotive.praktikum.master.ws2013.tripster.R;
+import tum.automotive.praktikum.master.ws2013.tripster.navi.far.NaviFarActivity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -73,7 +74,8 @@ public class NavigateWithMapsAPIDevActivity extends FragmentActivity {
 	}
 	
 	public void onClickLocationAsTarget(View v) {
-		Toast.makeText(this, "Location as target", Toast.LENGTH_SHORT).show();
+		Intent intentNaviFarActivity = new Intent(this, NaviFarActivity.class);
+		startActivity(intentNaviFarActivity);
 	}
 
 }

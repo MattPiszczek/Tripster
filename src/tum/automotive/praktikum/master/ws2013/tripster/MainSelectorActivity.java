@@ -1,5 +1,6 @@
 package tum.automotive.praktikum.master.ws2013.tripster;
 
+import tum.automotive.praktikum.master.ws2013.tripster.navi.far.NaviFarActivity;
 import tum.automotive.praktikum.master.ws2013.tripster.navi.menu.NavigateWithMapsAPIDevActivity;
 import android.app.Activity;
 import android.app.ActionBar;
