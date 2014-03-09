@@ -1,25 +1,26 @@
-package tum.automotive.praktikum.master.ws2013.tripster;
+package tum.automotive.praktikum.master.ws2013.tripster.navi.far;
 
-import tum.automotive.praktikum.master.ws2013.tripster.navi.far.NaviDevActivity;
+import tum.automotive.praktikum.master.ws2013.tripster.R;
+import tum.automotive.praktikum.master.ws2013.tripster.R.id;
+import tum.automotive.praktikum.master.ws2013.tripster.R.layout;
+import tum.automotive.praktikum.master.ws2013.tripster.R.menu;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 import android.os.Build;
 
-public class MainSelectorActivity extends Activity {
+public class NaviDevActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main_selector);
+		setContentView(R.layout.activity_navi_dev);
 
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
@@ -31,7 +32,7 @@ public class MainSelectorActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main_selector, menu);
+		getMenuInflater().inflate(R.menu.navi_dev, menu);
 		return true;
 	}
 
@@ -58,17 +59,10 @@ public class MainSelectorActivity extends Activity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main_selector,
+			View rootView = inflater.inflate(R.layout.fragment_navi_dev,
 					container, false);
 			return rootView;
 		}
-	}
-	
-	public void onClickFarDistanceNavi(View v) {
-		Toast.makeText(this, "FarDistanceNavi", Toast.LENGTH_SHORT).show();
-		Intent intentNaviFarDev = new Intent(this, NaviDevActivity.class);
-		startActivity(intentNaviFarDev);
-
 	}
 
 }

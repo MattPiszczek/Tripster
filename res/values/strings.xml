@@ -4,5 +4,7 @@
     <string name="app_name">Tripster</string>
     <string name="hello_info">Select activity:</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_navi_dev">NaviDevActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
