@@ -17,9 +17,19 @@
 package tum.automotive.praktikum.master.ws2013.tripster.navi.far;
 
 
+import tum.automotive.praktikum.master.ws2013.tripster.geofence.util.GeofenceUtils;
+import tum.automotive.praktikum.master.ws2013.tripster.geofence.util.SimpleGeofence;
+import tum.automotive.praktikum.master.ws2013.tripster.geofence.util.GeofenceUtils.REQUEST_TYPE;
+
+import tum.automotive.praktikum.master.ws2013.tripster.geofence.util.SimpleGeofenceStore;
+import tum.automotive.praktikum.master.ws2013.tripster.geofence.util.GeofenceUtils.REMOVE_TYPE;
+
+import tum.automotive.praktikum.master.ws2013.tripster.geofence.util.GeofenceRemover;
+import tum.automotive.praktikum.master.ws2013.tripster.geofence.util.GeofenceRequester;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -38,9 +48,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.TextureView.SurfaceTextureListener;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -72,6 +86,37 @@ public class NaviFarActivity extends FragmentActivity implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener {
 
+    private static final long GEOFENCE_EXPIRATION_IN_HOURS = 12;
+    private static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
+            GEOFENCE_EXPIRATION_IN_HOURS * DateUtils.HOUR_IN_MILLIS;
+    
+    // Store the current request
+    private REQUEST_TYPE mRequestType;
+    
+    // Store the current type of removal
+    private REMOVE_TYPE mRemoveType;
+
+    // Persistent storage for geofences
+    private SimpleGeofenceStore mPrefsGeo;
+
+    // Store a list of geofences to add
+    List<Geofence> mCurrentGeofences;
+    
+    // Add geofences handler
+    private GeofenceRequester mGeofenceRequester;
+    // Remove geofences handler
+    private GeofenceRemover mGeofenceRemover;
+    // Handle to geofence 1 latitude in the UI
+    
+    /*
+     * Internal lightweight geofence object
+     */
+    private SimpleGeofence mUIGeofence;
+    
+    private static String sTargetLatitude;		
+    private static String sTargetLongitude;	
+    private static String sTargetRadius;		
+	
 	// Munich Hauptbahnhof entrance address
 	private static String HPBFADDR = "48.141104, 11.559237";
     
@@ -627,6 +672,188 @@ public class NaviFarActivity extends FragmentActivity implements
             // Set the address in the UI
             mAddress.setText(address);
         }
+    }
+    
+    /**
+     * Called when the user clicks the "Register geofences" button.
+     * Get the geofence parameters for each geofence and add them to
+     * a List. Create the PendingIntent containing an Intent that
+     * Location Services sends to this app's broadcast receiver when
+     * Location Services detects a geofence transition. Send the List
+     * and the PendingIntent to Location Services.
+     */
+    public void registerTargetGeofence() {
+
+        /*
+         * Record the request as an ADD. If a connection error occurs,
+         * the app can automatically restart the add request if Google Play services
+         * can fix the error
+         */
+        mRequestType = GeofenceUtils.REQUEST_TYPE.ADD;
+
+        /*
+         * Check for Google Play services. Do this after
+         * setting the request type. If connecting to Google Play services
+         * fails, onActivityResult is eventually called, and it needs to
+         * know what type of request was in progress.
+         */
+        if (!servicesConnected()) {
+
+            return;
+        }
+
+        /*
+         * Check that the input fields have values and that the values are with the
+         * permitted range
+         */
+        if (!checkInputFields()) {
+            return;
+        }
+
+        /*
+         * Create a version of geofence 1 that is "flattened" into individual fields. This
+         * allows it to be stored in SharedPreferences.
+         */
+        mUIGeofence = new SimpleGeofence(
+            "hpbf",
+            // Get latitude, longitude, and radius from the UI
+            Double.valueOf(sTargetLatitude),
+            Double.valueOf(sTargetLongitude),
+            Float.valueOf(sTargetRadius),
+            // Set the expiration time
+            GEOFENCE_EXPIRATION_IN_MILLISECONDS,
+            // Only detect entry transitions
+            Geofence.GEOFENCE_TRANSITION_ENTER);
+
+        // Store this flat version in SharedPreferences
+        mPrefsGeo.setGeofence("hpbf", mUIGeofence);
+
+        /*
+         * Add Geofence objects to a List. toGeofence()
+         * creates a Location Services Geofence object from a
+         * flat object
+         */
+        mCurrentGeofences.add(mUIGeofence.toGeofence());
+
+        // Start the request. Fail if there's already a request in progress
+        try {
+            // Try to add geofences
+            mGeofenceRequester.addGeofences(mCurrentGeofences);
+        } catch (UnsupportedOperationException e) {
+            // Notify user that previous request hasn't finished.
+            Toast.makeText(this, R.string.add_geofences_already_requested_error,
+                        Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    /**
+     * Check all the input values and flag those that are incorrect
+     * @return true if all the widget values are correct; otherwise false
+     */
+    private boolean checkInputFields() {
+        // Start with the input validity flag set to true
+        boolean inputOK = true;
+
+        /*
+         * If all the input fields have been entered, test to ensure that their values are within
+         * the acceptable range. The tests can't be performed until it's confirmed that there are
+         * actual values in the fields.
+         */
+        if (inputOK) {
+
+            /*
+             * Get values from the latitude, longitude, and radius fields.
+             */
+            double lat = Double.valueOf(sTargetLatitude);
+            double lng = Double.valueOf(sTargetLongitude);
+            float rd = Float.valueOf(sTargetRadius);
+
+            /*
+             * Test latitude and longitude for minimum and maximum values. Highlight incorrect
+             * values and set a Toast in the UI.
+             */
+
+            if (lat > GeofenceUtils.MAX_LATITUDE || lat < GeofenceUtils.MIN_LATITUDE) {
+                Toast.makeText(
+                        this,
+                        R.string.geofence_input_error_latitude_invalid,
+                        Toast.LENGTH_LONG).show();
+
+                // Set the validity to "invalid" (false)
+                inputOK = false;
+            }
+            if ((lng > GeofenceUtils.MAX_LONGITUDE) || (lng < GeofenceUtils.MIN_LONGITUDE)) {
+                Toast.makeText(
+                        this,
+                        R.string.geofence_input_error_longitude_invalid,
+                        Toast.LENGTH_LONG).show();
+
+                // Set the validity to "invalid" (false)
+                inputOK = false;
+            }
+
+            if (rd < GeofenceUtils.MIN_RADIUS) {
+                Toast.makeText(
+                        this,
+                        R.string.geofence_input_error_radius_invalid,
+                        Toast.LENGTH_LONG).show();
+
+                // Set the validity to "invalid" (false)
+                inputOK = false;
+            }
+        }
+
+        // If everything passes, the validity flag will still be true, otherwise it will be false.
+        return inputOK;
+    }
+    
+    /**
+     * Removes all registered geofences
+     */
+    public void unregisterGeofences() {
+        /*
+         * Remove all geofences set by this app. To do this, get the
+         * PendingIntent that was added when the geofences were added
+         * and use it as an argument to removeGeofences(). The removal
+         * happens asynchronously; Location Services calls
+         * onRemoveGeofencesByPendingIntentResult() (implemented in
+         * the current Activity) when the removal is done
+         */
+
+        /*
+         * Record the removal as remove by Intent. If a connection error occurs,
+         * the app can automatically restart the removal if Google Play services
+         * can fix the error
+         */
+        // Record the type of removal
+        mRemoveType = GeofenceUtils.REMOVE_TYPE.INTENT;
+
+        /*
+         * Check for Google Play services. Do this after
+         * setting the request type. If connecting to Google Play services
+         * fails, onActivityResult is eventually called, and it needs to
+         * know what type of request was in progress.
+         */
+        if (!servicesConnected()) {
+
+            return;
+        }
+
+        // Try to make a removal request
+        try {
+        /*
+         * Remove the geofences represented by the currently-active PendingIntent. If the
+         * PendingIntent was removed for some reason, re-create it; since it's always
+         * created with FLAG_UPDATE_CURRENT, an identical PendingIntent is always created.
+         */
+        mGeofenceRemover.removeGeofencesByIntent(mGeofenceRequester.getRequestPendingIntent());
+
+        } catch (UnsupportedOperationException e) {
+            // Notify user that previous request hasn't finished.
+            Toast.makeText(this, R.string.remove_geofences_already_requested_error,
+                        Toast.LENGTH_LONG).show();
+        }
+
     }
 
     /**

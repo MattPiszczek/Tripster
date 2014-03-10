@@ -4,5 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="tum.automotive.praktikum.master.ws2013.tripster.navi.far.NaviDevActivity"
-    tools:ignore="MergeRootFrame" />
+   	tools:ignore="MergeRootFrame" >
+</FrameLayout>
 

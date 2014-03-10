@@ -19,6 +19,7 @@ public class NavigateWithMapsAPIDevActivity extends FragmentActivity {
 	
 	 public final static String EXTRA_BOOLEAN = "tum.automotive.praktikum.master.ws2013.tripster.BOOLEAN";
 	 private boolean navigate;
+	 private boolean naviWithoutAR;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,15 +70,17 @@ public class NavigateWithMapsAPIDevActivity extends FragmentActivity {
 		}
 	}
 	
-	public void onClickTargetFromMap(View v) {
-		Intent intentOpenGoogleNavi = new Intent(this, NaviFarActivity.class);
-		navigate = true;
-		intentOpenGoogleNavi.putExtra(EXTRA_BOOLEAN, navigate);
-		startActivity(intentOpenGoogleNavi);
+	public void onClickNaviWithoutAR(View v) {
+		Toast.makeText(this, "NaviWithoutAR", Toast.LENGTH_SHORT).show();
+		naviWithoutAR = true;
 	}
 	
 	public void onClickHpbfAsTarget(View v) {
 		Toast.makeText(this, "Go to Hpbf Munich", Toast.LENGTH_SHORT).show();
+		Intent intentOpenGoogleNavi = new Intent(this, NaviFarActivity.class);
+		navigate = true;
+		intentOpenGoogleNavi.putExtra(EXTRA_BOOLEAN, navigate);
+		startActivity(intentOpenGoogleNavi);
 	}
 	
 	public void onClickLocationAsTarget(View v) {
