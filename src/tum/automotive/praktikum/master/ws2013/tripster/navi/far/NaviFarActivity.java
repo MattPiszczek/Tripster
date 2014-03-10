@@ -105,6 +105,7 @@ public class NaviFarActivity extends FragmentActivity implements
      * Indicate if delegation to the google maps application is required
      */
     boolean mInvokeMap;
+    boolean mFreshInvokeMap = true;
     
     /*
      * Initialize the Activity
@@ -409,11 +410,11 @@ public class NaviFarActivity extends FragmentActivity implements
             startPeriodicUpdates();
         }
         
-        if(mInvokeMap) {
+        if(mInvokeMap&&mFreshInvokeMap) {
         	Location currentLocation =  null;
         	// get location and invoke maps
         	waitForServices();
-
+        	mFreshInvokeMap = false;
             // Get the current location
         	currentLocation = mLocationClient.getLastLocation();
         	Intent intentGoogleMaps = new Intent(Intent.ACTION_VIEW, 
