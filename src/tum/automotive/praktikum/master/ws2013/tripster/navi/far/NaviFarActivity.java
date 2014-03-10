@@ -28,6 +28,7 @@ import android.content.IntentSender;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.Locale;
 
 import tum.automotive.praktikum.master.ws2013.tripster.R;
+import tum.automotive.praktikum.master.ws2013.tripster.navi.menu.NavigateWithMapsAPIDevActivity;
 import tum.automotive.praktikum.master.ws2013.tripster.navi.util.LocationUtils;
 
 /**
@@ -70,7 +72,10 @@ public class NaviFarActivity extends FragmentActivity implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener {
 
-    // A request to connect to Location Services
+	// Munich Hauptbahnhof entrance address
+	private static String HPBFADDR = "48.141104, 11.559237";
+    
+	// A request to connect to Location Services
     private LocationRequest mLocationRequest;
 
     // Stores the current instantiation of the location client in this object
@@ -95,7 +100,12 @@ public class NaviFarActivity extends FragmentActivity implements
      *
      */
     boolean mUpdatesRequested = false;
-
+    
+    /*
+     * Indicate if delegation to the google maps application is required
+     */
+    boolean mInvokeMap;
+    
     /*
      * Initialize the Activity
      */
@@ -139,6 +149,9 @@ public class NaviFarActivity extends FragmentActivity implements
          * handle callbacks.
          */
         mLocationClient = new LocationClient(this, this, this);
+        
+        Intent intent = getIntent();
+        mInvokeMap = intent.getBooleanExtra(NavigateWithMapsAPIDevActivity.EXTRA_BOOLEAN, false);
 
     }
 
@@ -287,6 +300,21 @@ public class NaviFarActivity extends FragmentActivity implements
             return false;
         }
     }
+    
+    /*
+     * Waiting for secure connection to the Google Services
+     */
+    private void waitForServices() {
+		
+    	int resultCode;
+    	do {
+		// Check that Google Play services is available
+        resultCode =
+                GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+    	} while (!(ConnectionResult.SUCCESS == resultCode));
+        
+        return;	
+    }
 
     /**
      * Invoked by the "Get Location" button.
@@ -379,6 +407,18 @@ public class NaviFarActivity extends FragmentActivity implements
 
         if (mUpdatesRequested) {
             startPeriodicUpdates();
+        }
+        
+        if(mInvokeMap) {
+        	Location currentLocation =  null;
+        	// get location and invoke maps
+        	waitForServices();
+
+            // Get the current location
+        	currentLocation = mLocationClient.getLastLocation();
+        	Intent intentGoogleMaps = new Intent(Intent.ACTION_VIEW, 
+        			Uri.parse("http://maps.google.com/maps?saddr="+LocationUtils.getLatLng(this, currentLocation)+"&daddr="+HPBFADDR));
+        	startActivity(intentGoogleMaps);
         }
     }
 

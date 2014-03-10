@@ -9,7 +9,7 @@
     <string name="unknown">-- Unknown --</string>
     <string name="title_activity_navigate">Location Activity</string>
     
-        <!-- Address format -->
+    <!-- Address format -->
     <string name="address_output_string">%1$s %2$s %3$s</string>
 
     <!-- Latitude, longitude format -->

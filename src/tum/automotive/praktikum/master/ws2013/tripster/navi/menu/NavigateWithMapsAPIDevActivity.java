@@ -5,6 +5,7 @@ import tum.automotive.praktikum.master.ws2013.tripster.R;
 import tum.automotive.praktikum.master.ws2013.tripster.navi.far.NaviFarActivity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
@@ -15,6 +16,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 public class NavigateWithMapsAPIDevActivity extends FragmentActivity {
+	
+	 public final static String EXTRA_BOOLEAN = "tum.automotive.praktikum.master.ws2013.tripster.BOOLEAN";
+	 private boolean navigate;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +70,10 @@ public class NavigateWithMapsAPIDevActivity extends FragmentActivity {
 	}
 	
 	public void onClickTargetFromMap(View v) {
-		Toast.makeText(this, "From Map", Toast.LENGTH_SHORT).show();
+		Intent intentOpenGoogleNavi = new Intent(this, NaviFarActivity.class);
+		navigate = true;
+		intentOpenGoogleNavi.putExtra(EXTRA_BOOLEAN, navigate);
+		startActivity(intentOpenGoogleNavi);
 	}
 	
 	public void onClickHpbfAsTarget(View v) {
@@ -75,6 +82,8 @@ public class NavigateWithMapsAPIDevActivity extends FragmentActivity {
 	
 	public void onClickLocationAsTarget(View v) {
 		Intent intentNaviFarActivity = new Intent(this, NaviFarActivity.class);
+		navigate = false;
+		intentNaviFarActivity.putExtra(EXTRA_BOOLEAN, navigate);
 		startActivity(intentNaviFarActivity);
 	}
 
