@@ -114,7 +114,7 @@ public final class GeofenceUtils {
      * Define a request code to send to Google Play services
      * This code is returned in Activity.onActivityResult
      */
-    public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9009;
 
     // A string of length 0, used to clear out input fields
     public static final String EMPTY_STRING = new String();
