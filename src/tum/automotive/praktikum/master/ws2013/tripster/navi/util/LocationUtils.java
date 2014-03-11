@@ -16,10 +16,11 @@
 
 package tum.automotive.praktikum.master.ws2013.tripster.navi.util;
 
+import tum.automotive.praktikum.master.ws2013.tripster.R;
 import android.content.Context;
 import android.location.Location;
 
-import tum.automotive.praktikum.master.ws2013.tripster.R;
+
 
 /**
  * Defines app-wide constants and utilities

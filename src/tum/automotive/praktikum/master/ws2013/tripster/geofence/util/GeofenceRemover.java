@@ -22,6 +22,8 @@ import java.util.List;
 
 import tum.automotive.praktikum.master.ws2013.tripster.R;
 
+
+
 /**
  * Class for connecting to Location Services and removing geofences.
  * <p>

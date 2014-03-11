@@ -43,7 +43,7 @@
         android:layout_alignLeft="@+id/buttonHasTarget"
         android:layout_alignRight="@+id/buttonHasTarget"
         android:layout_below="@+id/buttonHasTarget"
-        android:onClick="onClickTargetFromMap"
-        android:text="Pick Target from Map" />
+        android:onClick="onClickNaviWithoutAR"
+        android:text="NaviWithoutAR" />
 
 </RelativeLayout>

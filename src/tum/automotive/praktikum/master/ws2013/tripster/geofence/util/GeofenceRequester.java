@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
 import tum.automotive.praktikum.master.ws2013.tripster.R;
 import tum.automotive.praktikum.master.ws2013.tripster.navi.far.ReceiveTransitionsIntentService;
 

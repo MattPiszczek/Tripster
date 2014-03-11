@@ -1,6 +1,7 @@
 package tum.automotive.praktikum.master.ws2013.tripster.navi.menu;
 
 
+
 import tum.automotive.praktikum.master.ws2013.tripster.R;
 import tum.automotive.praktikum.master.ws2013.tripster.navi.far.NaviFarActivity;
 import android.app.Fragment;
@@ -17,7 +18,10 @@ import android.widget.Toast;
 
 public class NavigateWithMapsAPIDevActivity extends FragmentActivity {
 	
-	 public final static String EXTRA_BOOLEAN = "tum.automotive.praktikum.master.ws2013.tripster.BOOLEAN";
+	 public final static String EXTRA_GOOGLE_MAPS_NAVI_INDICATOR = 
+			 "tum.automotive.praktikum.master.ws2013.tripster.GOOGLE_MAPS_NAVI_INDICATOR";
+	 public final static String EXTRA_NO_AR_NAVI_VIEW_INDICATOR =
+			 "tum.automotive.praktikum.master.ws2013.tripster.NO_AR_NAVI_VIEW_INDICATOR";
 	 private boolean navigate;
 	 private boolean naviWithoutAR;
 
@@ -73,20 +77,24 @@ public class NavigateWithMapsAPIDevActivity extends FragmentActivity {
 	public void onClickNaviWithoutAR(View v) {
 		Toast.makeText(this, "NaviWithoutAR", Toast.LENGTH_SHORT).show();
 		naviWithoutAR = true;
+		navigate = false;
+		Intent intentNoARNavi = new Intent(this, NaviFarActivity.class);
+		intentNoARNavi.putExtra(EXTRA_NO_AR_NAVI_VIEW_INDICATOR, naviWithoutAR);
+		startActivity(intentNoARNavi);
 	}
 	
 	public void onClickHpbfAsTarget(View v) {
 		Toast.makeText(this, "Go to Hpbf Munich", Toast.LENGTH_SHORT).show();
 		Intent intentOpenGoogleNavi = new Intent(this, NaviFarActivity.class);
 		navigate = true;
-		intentOpenGoogleNavi.putExtra(EXTRA_BOOLEAN, navigate);
+		intentOpenGoogleNavi.putExtra(EXTRA_GOOGLE_MAPS_NAVI_INDICATOR, navigate);
 		startActivity(intentOpenGoogleNavi);
 	}
 	
 	public void onClickLocationAsTarget(View v) {
 		Intent intentNaviFarActivity = new Intent(this, NaviFarActivity.class);
 		navigate = false;
-		intentNaviFarActivity.putExtra(EXTRA_BOOLEAN, navigate);
+		intentNaviFarActivity.putExtra(EXTRA_GOOGLE_MAPS_NAVI_INDICATOR, navigate);
 		startActivity(intentNaviFarActivity);
 	}
 

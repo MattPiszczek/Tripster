@@ -16,11 +16,13 @@
 
 package tum.automotive.praktikum.master.ws2013.tripster.navi.util;
 
+import tum.automotive.praktikum.master.ws2013.tripster.R;
+
 import com.google.android.gms.common.ConnectionResult;
 import android.content.Context;
 import android.content.res.Resources;
 
-import tum.automotive.praktikum.master.ws2013.tripster.R;
+
 
 /**
  * Map error codes to error messages.

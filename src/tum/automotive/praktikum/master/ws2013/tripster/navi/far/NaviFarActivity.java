@@ -17,6 +17,7 @@
 package tum.automotive.praktikum.master.ws2013.tripster.navi.far;
 
 
+import tum.automotive.praktikum.master.ws2013.tripster.R;
 import tum.automotive.praktikum.master.ws2013.tripster.geofence.util.GeofenceUtils;
 import tum.automotive.praktikum.master.ws2013.tripster.geofence.util.SimpleGeofence;
 import tum.automotive.praktikum.master.ws2013.tripster.geofence.util.GeofenceUtils.REQUEST_TYPE;
@@ -61,6 +62,7 @@ import android.util.Log;
 import android.view.TextureView.SurfaceTextureListener;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,8 +71,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import tum.automotive.praktikum.master.ws2013.tripster.R;
+
 import tum.automotive.praktikum.master.ws2013.tripster.navi.menu.NavigateWithMapsAPIDevActivity;
+import tum.automotive.praktikum.master.ws2013.tripster.navi.util.ArrowView;
 import tum.automotive.praktikum.master.ws2013.tripster.navi.util.LocationUtils;
 
 /**
@@ -164,11 +167,20 @@ public class NaviFarActivity extends FragmentActivity implements
     /*
      * Indicate if delegation to the google maps application is required
      */
-    boolean mInvokeMap;
-    boolean mFreshInvokeMap = true;
+    private boolean mInvokeMap;
+    private boolean mNoARNaviView;
+    
+    private boolean mFreshInvokeMap = true;
     
     // Store the list of geofences to remove
     private List<String> mGeofenceIdsToRemove;
+    
+    // Frame
+    RelativeLayout mRelativeLayoutFrame;
+    /*
+     *  Views to fill  RelativeLayout
+     */
+    private ArrowView mArrowView;
     
     /*
      * Initialize the Activity
@@ -176,14 +188,26 @@ public class NaviFarActivity extends FragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_navi_dev);
-
-        // Get handles to the UI view objects
-        mLatLng = (TextView) findViewById(R.id.lat_lng);
-        mAddress = (TextView) findViewById(R.id.address);
-        mActivityIndicator = (ProgressBar) findViewById(R.id.address_progress);
-        mConnectionState = (TextView) findViewById(R.id.text_connection_state);
-        mConnectionStatus = (TextView) findViewById(R.id.text_connection_status);
+        
+        Intent intent = getIntent();
+        mInvokeMap = intent.getBooleanExtra(NavigateWithMapsAPIDevActivity.EXTRA_GOOGLE_MAPS_NAVI_INDICATOR, false);
+        mNoARNaviView = intent.getBooleanExtra(NavigateWithMapsAPIDevActivity.EXTRA_NO_AR_NAVI_VIEW_INDICATOR, false);
+        
+        if(mNoARNaviView) {
+        	setContentView(R.layout.activity_navigate);
+        	mRelativeLayoutFrame = (RelativeLayout) findViewById(R.id.frame);
+        	mArrowView = new ArrowView(getApplicationContext());
+        	mArrowView.setmFrame(mRelativeLayoutFrame);
+        	mRelativeLayoutFrame.addView(mArrowView);
+        } else {
+        	setContentView(R.layout.fragment_navi_dev);
+        	// Get handles to the UI view objects
+            mLatLng = (TextView) findViewById(R.id.lat_lng);
+            mAddress = (TextView) findViewById(R.id.address);
+            mActivityIndicator = (ProgressBar) findViewById(R.id.address_progress);
+            mConnectionState = (TextView) findViewById(R.id.text_connection_state);
+            mConnectionStatus = (TextView) findViewById(R.id.text_connection_status);
+        }
 
         // Create a new global location parameters object
         mLocationRequest = LocationRequest.create();
@@ -246,9 +270,6 @@ public class NaviFarActivity extends FragmentActivity implements
         mGeofenceRemover = new GeofenceRemover(this);
 
         /*********************************************************************************/
-        
-        Intent intent = getIntent();
-        mInvokeMap = intent.getBooleanExtra(NavigateWithMapsAPIDevActivity.EXTRA_BOOLEAN, false);
 
     }
 
@@ -348,21 +369,22 @@ public class NaviFarActivity extends FragmentActivity implements
 
                         // Log the result
                         Log.d(LocationUtils.APPTAG, getString(R.string.resolved));
-
-                        // Display the result
-                        mConnectionState.setText(R.string.connected);
-                        mConnectionStatus.setText(R.string.resolved);
+                        if(!mNoARNaviView) {
+                        	// Display the result
+                        	mConnectionState.setText(R.string.connected);
+                        	mConnectionStatus.setText(R.string.resolved);
+                        }
                     break;
 
                     // If any other result was returned by Google Play services
                     default:
                         // Log the result
                         Log.d(LocationUtils.APPTAG, getString(R.string.no_resolution));
-
-                        // Display the result
-                        mConnectionState.setText(R.string.disconnected);
-                        mConnectionStatus.setText(R.string.no_resolution);
-
+                        if(!mNoARNaviView) {
+	                        // Display the result
+	                        mConnectionState.setText(R.string.disconnected);
+	                        mConnectionStatus.setText(R.string.no_resolution);
+                        }
                     break;
                 }
 
@@ -480,9 +502,10 @@ public class NaviFarActivity extends FragmentActivity implements
 
             // Get the current location
             Location currentLocation = mLocationClient.getLastLocation();
-
-            // Display the current location in the UI
-            mLatLng.setText(LocationUtils.getLatLng(this, currentLocation));
+            if(!mNoARNaviView) {
+	            // Display the current location in the UI
+	            mLatLng.setText(LocationUtils.getLatLng(this, currentLocation));
+            }
         }
     }
 
@@ -553,8 +576,11 @@ public class NaviFarActivity extends FragmentActivity implements
      */
     @Override
     public void onConnected(Bundle bundle) {
-        mConnectionStatus.setText(R.string.connected);
-
+    	
+    	if(!mNoARNaviView) {
+    		mConnectionStatus.setText(R.string.connected);
+    	}
+    	
         if (mUpdatesRequested) {
             startPeriodicUpdates();
         }
@@ -580,8 +606,10 @@ public class NaviFarActivity extends FragmentActivity implements
      */
     @Override
     public void onDisconnected() {
-        mConnectionStatus.setText(R.string.disconnected);
-        unregisterGeofences();
+    	if(!mNoARNaviView) {
+    		mConnectionStatus.setText(R.string.disconnected);
+    	}
+		unregisterGeofences();
     }
 
     /*
@@ -629,12 +657,14 @@ public class NaviFarActivity extends FragmentActivity implements
      */
     @Override
     public void onLocationChanged(Location location) {
-
-        // Report to the UI that the location was updated
-        mConnectionStatus.setText(R.string.location_updated);
-
-        // In the UI, set the latitude and longitude to the value received
-        mLatLng.setText(LocationUtils.getLatLng(this, location));
+    	
+    	if(!mNoARNaviView) {
+	        // Report to the UI that the location was updated
+	        mConnectionStatus.setText(R.string.location_updated);
+	
+	        // In the UI, set the latitude and longitude to the value received
+	        mLatLng.setText(LocationUtils.getLatLng(this, location));
+    	}
     }
 
     /**
@@ -644,7 +674,9 @@ public class NaviFarActivity extends FragmentActivity implements
     private void startPeriodicUpdates() {
 
         mLocationClient.requestLocationUpdates(mLocationRequest, this);
-        mConnectionState.setText(R.string.location_requested);
+        if(!mNoARNaviView) {
+        	mConnectionState.setText(R.string.location_requested);
+        }
     }
 
     /**
@@ -653,7 +685,9 @@ public class NaviFarActivity extends FragmentActivity implements
      */
     private void stopPeriodicUpdates() {
         mLocationClient.removeLocationUpdates(this);
-        mConnectionState.setText(R.string.location_updates_stopped);
+        if(!mNoARNaviView) {
+        	mConnectionState.setText(R.string.location_updates_stopped);
+        }
     }
 
     /**
