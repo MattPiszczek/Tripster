@@ -19,6 +19,7 @@ package tum.automotive.praktikum.master.ws2013.tripster.navi.util;
 import tum.automotive.praktikum.master.ws2013.tripster.R;
 import android.content.Context;
 import android.location.Location;
+import java.lang.Math.*;
 
 
 
@@ -113,5 +114,16 @@ public final class LocationUtils {
     	double targetLat = new Double(venueLat);
     	double targetLng = new Double(venueLng);
     	return calculateDistance(userLat, userLng, targetLat, targetLng);
+    }
+    
+    public double getLocationsAngle(Location currentLocation, Location targetLocation) {
+    	double xdiff;
+    	double ydiff;
+    	xdiff = currentLocation.getLatitude() - targetLocation.getLatitude();
+    	xdiff = (xdiff > 0) ? xdiff : -xdiff;
+    	ydiff = currentLocation.getLongitude() - targetLocation.getLongitude();
+    	ydiff = (ydiff > 0) ? ydiff : -ydiff;
+    	double result = Math.atan2(ydiff, xdiff);
+    	return result;
     }
 }

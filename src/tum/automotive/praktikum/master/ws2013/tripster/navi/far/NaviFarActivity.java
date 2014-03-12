@@ -98,6 +98,11 @@ public class NaviFarActivity extends FragmentActivity implements
     private static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
             GEOFENCE_EXPIRATION_IN_HOURS * DateUtils.HOUR_IN_MILLIS;
     
+    /**
+     * @OnlyForDebug remove proceeding code
+     */
+    private double debugRotationDegress = 0.0;
+    
     // Store the current request
     private REQUEST_TYPE mRequestType;
     
@@ -579,7 +584,11 @@ public class NaviFarActivity extends FragmentActivity implements
     	
     	if(!mNoARNaviView) {
     		mConnectionStatus.setText(R.string.connected);
-    	}
+    	} else
+    		mUpdatesRequested = true;
+    	/**
+    	 * @OnlyForDebuging remove upper else !
+    	 */
     	
         if (mUpdatesRequested) {
             startPeriodicUpdates();
@@ -664,6 +673,12 @@ public class NaviFarActivity extends FragmentActivity implements
 	
 	        // In the UI, set the latitude and longitude to the value received
 	        mLatLng.setText(LocationUtils.getLatLng(this, location));
+    	} else {
+    		// here must be invoked degress computation
+    		debugRotationDegress+=90;
+    		debugRotationDegress = (debugRotationDegress > 360) ? 0: debugRotationDegress; 
+    		mArrowView.setmRotationInDegress(debugRotationDegress);
+    		mArrowView.invalidate();
     	}
     }
 
